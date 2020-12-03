@@ -1,11 +1,7 @@
-using Random
-using IterTools
-
 nums = Array{Int,1}()
 for l in readlines("input01.txt")
 	append!(nums, parse(Int, l))
 end
-shuffle!(nums)
 
 println("Raw loops")
 @time for i in 1:length(nums)-1, j in i+1:length(nums)
@@ -20,6 +16,7 @@ end
 	end
 end
 
+using IterTools
 println("\nIterTools")
 @time for s in subsets(nums, 2)
 	if s[1]+s[2] == 2020
