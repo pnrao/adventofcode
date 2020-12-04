@@ -1,8 +1,8 @@
 F = readlines("input03.txt") # forest
+colMax = length(F[1])
+rowMax = length(F)
 
 function slide(rt, dn)
-    colMax = length(F[1])
-    rowMax = length(F)
     row,col=1,1
     tN = F[row][col]=='#' ? 1 : 0
     while row<rowMax
