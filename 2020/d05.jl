@@ -4,11 +4,8 @@ function decode(s)
     base=2)
 end
 
-seats=readlines("input05.txt")|>l->decode.(l)
-stmin = seats|>minimum
-stmax = seats|>maximum
-print("Last: ")
-println(stmax)
+seats=readlines("input05.txt")|>l->decode.(l)|>sort
+println("Last: ", seats[end])
 
 print("Available: ")
-println(setdiff([stmin:stmax;], seats))
+println(setdiff([seats[1]:seats[end];], seats))
