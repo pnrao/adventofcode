@@ -1,10 +1,10 @@
 function decode(s)
     parse(Int,
-    replace(replace(s, r"F|L"=>"0"), r"B|R"=>"1"),
-    base=2)
+          replace(replace(s, r"F|L"=>"0"), r"B|R"=>"1"),
+          base=2)
 end
 
-seats=readlines("input05.txt")|>l->decode.(l)|>sort
+seats=readlines("input05.txt").|>decode|>sort
 println("Last: ", seats[end])
 
 print("Available: ")
