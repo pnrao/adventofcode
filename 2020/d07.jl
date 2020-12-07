@@ -1,7 +1,7 @@
 function scanline(line)
-    k,v = split(line[1:end-1], " bags contain ")
+    k,v = split(line, " bags contain ")
     ins=Dict{String, Int}()
-    for m ∈ collect(eachmatch(r"(?<num>\d+) (?<colr>\w+ \w+) bags?", v))
+    for m ∈ eachmatch(r"(?<num>\d+) (?<colr>\w+ \w+) bags?", v)
         ins[m[:colr]] = parse(Int, m[:num])
     end
     return k,ins
