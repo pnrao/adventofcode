@@ -17,6 +17,7 @@ function scanfile(f)
 end
 
 function inbag_here(d, b)
+    # return a set of bags that contain bag b just one level deep
     s = Set()
     for p ∈ d
         if haskey(p.second, b)
@@ -27,23 +28,26 @@ function inbag_here(d, b)
 end
 
 function inbag_deep(d, colr)
+    # return a set of bags that contain bag colr in any depth
     n = 0
-    lall = Set([colr])
+    oball = Set([colr]) # set of all bags to check for outer bags
     while true
-        ln = Set()
+        obnew = Set()
         n+=1
-        for l in lall
+        for l in oball
+            # get a set of outer bags for each bag of interest
             b=inbag_here(d, l)
-            ln=union(ln, b)
+            union!(obnew, b)
         end
-        if ln ⊆ lall
+        if obnew ⊆ oball
+            # if we have discovered no new outer bags
             break
         else
-            union!(lall, ln)
+            union!(oball, obnew)
         end
     end
     @info "Finally, after $n loops"
-    return delete!(lall, colr)
+    return delete!(oball, colr)
 end
 
 function hasbag(d, colr)
