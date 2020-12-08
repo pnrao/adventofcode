@@ -1,10 +1,9 @@
 function simulate(code)
     acc = 0
-    cpc = 1 # current pc
+    cpc = 1 # current program counter
     inf = false # infinite loop detected
     visited = falses(length(code))
     while true
-        op = code[cpc] # only for viewing in the debugger
         if visited[cpc] == false
             visited[cpc]=true
         else
@@ -28,12 +27,15 @@ end
 
 rominstrs = readlines("input08.txt").|>split.|>p->[p[1][1], parse(Int, p[2])]
 
-for modpc in 0:length(rominstrs)
-    myinstrs = deepcopy(rominstrs)
-    if modpc>0
-        myinstrs[modpc][1]=='a' && continue
-        myinstrs[modpc][1] = myinstrs[modpc][1]=='j' ? 'n' : 'j'
+a,c,i=simulate(rominstrs)
+println("Unmodified: acc=$a, cpc=$c, infinite-loop=$i")
+
+for modpc in 1:length(rominstrs)
+    if rominstrs[modpc][1]=='a'
+        continue
     end
-    local a,c,i=simulate(myinstrs)
-    (i==false||modpc==0) && println("Mod@pc $modpc: acc=$a, cpc=$c, inf=$i")
+    myinstrs = deepcopy(rominstrs)
+    myinstrs[modpc][1] = myinstrs[modpc][1]=='j' ? 'n' : 'j'
+    global a,c,i=simulate(myinstrs)
+    i==false && println("Mod@pc $modpc: acc=$a, cpc=$c, infinite-loop=$i")
 end
