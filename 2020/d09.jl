@@ -2,7 +2,7 @@ chkN = 25 # size of last N numbers to check
 ns = Array{Int,1}()
 n = 0
 valid = false
-for l in readlines("input09.txt")
+for l in eachline("input09.txt")
     global n=parse(Int,l)
     if length(ns) < chkN
         append!(ns,n)
@@ -24,8 +24,9 @@ if !valid
 end
 
 for size∈2:length(ns), strt∈1:length(ns)-size+1
-    if sum(ns[strt:strt+size-1]) == n
-        weakness = max(ns[strt:strt+size-1]...)+min(ns[strt:strt+size-1]...)
+    buf = @view ns[strt:strt+size-1]
+    if sum(buf) == n
+        weakness = sum(extrema(buf))
         println("Encryption weakness is $weakness")
         break
     end
