@@ -1,3 +1,5 @@
+using BenchmarkTools
+
 function simulate(code)
     acc = 0
     cpc = 1 # current program counter
@@ -25,17 +27,19 @@ function simulate(code)
     return acc,cpc,inf
 end
 
-rominstrs = readlines("input08.txt").|>split.|>p->[p[1][1], parse(Int, p[2])]
+rominstrs = @btime readlines("input08.txt").|>split.|>p->[p[1][1], parse(Int, p[2])]
 
-a,c,i=simulate(rominstrs)
+a,c,i=@btime simulate(rominstrs)
 println("Unmodified: acc=$a, cpc=$c, infinite-loop=$i")
 
-for modpc in 1:length(rominstrs)
+global modpc=0
+@btime for modpc in 1:length(rominstrs)
     if rominstrs[modpc][1]=='a'
         continue
     end
-    myinstrs = deepcopy(rominstrs)
-    myinstrs[modpc][1] = myinstrs[modpc][1]=='j' ? 'n' : 'j'
-    global a,c,i=simulate(myinstrs)
-    i==false && println("Mod@pc $modpc: acc=$a, cpc=$c, infinite-loop=$i")
+    rominstrs[modpc][1] = rominstrs[modpc][1]=='j' ? 'n' : 'j'
+    global a,c,i=simulate(rominstrs)
+    i==false && break
+    rominstrs[modpc][1] = rominstrs[modpc][1]=='j' ? 'n' : 'j'
 end
+println("Mod@pc $modpc: acc=$a, cpc=$c, infinite-loop=$i")
