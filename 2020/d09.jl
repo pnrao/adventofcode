@@ -26,7 +26,7 @@ end
 for size∈2:length(ns), strt∈1:length(ns)-size+1
     if sum(ns[strt:strt+size-1]) == n
         weakness = max(ns[strt:strt+size-1]...)+min(ns[strt:strt+size-1]...)
-        println("Encryption weakness is: ", weakness)
+        println("Encryption weakness is $weakness")
         break
     end
 end
