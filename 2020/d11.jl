@@ -1,7 +1,4 @@
-using PrettyPrint
-using BenchmarkTools
-
-@views function isfull(seats,r,c)
+@inline @views function isfull(seats,r,c)
     if checkbounds(Bool, seats, r, c)
         seats[r,c]=='#' && return 1
         return 0
@@ -10,7 +7,7 @@ using BenchmarkTools
     end
 end
 
-@views function adjacents1(seats, r, c)
+@inline @views function adjacents1(seats, r, c)
     isfull(seats,r-1,c-1)+
     isfull(seats,r-1,c)+
     isfull(seats,r-1,c+1)+
@@ -41,13 +38,13 @@ end
 end
 
 newseats=reduce(vcat, permutedims.(collect.(readlines("input11.txt"))))
-@btime while true
+@time while true
     global newseats,moved=reshuffle1(newseats)
     !moved && break
 end
 println("Final count for Part 1: ", count(==('#'), newseats))
 
-@views function adjacentsdir(seats, r, c, rdir, cdir)
+@inline @views function adjacentsdir(seats, r, c, rdir, cdir)
     if checkbounds(Bool, seats, r+rdir, c+cdir)
         if seats[r+rdir,c+cdir] == '#'
             return 1
@@ -61,7 +58,7 @@ println("Final count for Part 1: ", count(==('#'), newseats))
     end
 end
 
-@views function adjacents2(seats, r, c)
+@inline @views function adjacents2(seats, r, c)
     adjacentsdir(seats, r, c, -1, -1)+
     adjacentsdir(seats, r, c, -1,  0)+
     adjacentsdir(seats, r, c, -1, +1)+
@@ -92,7 +89,7 @@ end
 end
 
 newseats=reduce(vcat, permutedims.(collect.(readlines("input11.txt"))))
-@btime while true
+@time while true
     global newseats,moved=reshuffle2(newseats)
     !moved && break
 end
