@@ -1,4 +1,5 @@
 using PrettyPrint
+using BenchmarkTools
 
 @views function isfull(seats,r,c)
     if checkbounds(Bool, seats, r, c)
@@ -40,7 +41,7 @@ end
 end
 
 newseats=reduce(vcat, permutedims.(collect.(readlines("input11.txt"))))
-@time while true
+@btime while true
     global newseats,moved=reshuffle1(newseats)
     !moved && break
 end
@@ -91,7 +92,7 @@ end
 end
 
 newseats=reduce(vcat, permutedims.(collect.(readlines("input11.txt"))))
-@time while true
+@btime while true
     global newseats,moved=reshuffle2(newseats)
     !moved && break
 end
