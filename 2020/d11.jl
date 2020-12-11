@@ -1,10 +1,10 @@
 using PrettyPrint
 
 @views function isfull(seats,r,c)
-    try
+    if checkbounds(Bool, seats, r, c)
         seats[r,c]=='#' && return 1
         return 0
-    catch
+    else
         return 0
     end
 end
@@ -47,7 +47,7 @@ end
 println("Final count for Part 1: ", count(==('#'), newseats))
 
 @views function adjacentsdir(seats, r, c, rdir, cdir)
-    try
+    if checkbounds(Bool, seats, r+rdir, c+cdir)
         if seats[r+rdir,c+cdir] == '#'
             return 1
         elseif seats[r+rdir,c+cdir] == 'L'
@@ -55,7 +55,7 @@ println("Final count for Part 1: ", count(==('#'), newseats))
         else
             return adjacentsdir(seats, r+rdir, c+cdir, rdir, cdir)
         end
-    catch
+    else
         return 0
     end
 end
