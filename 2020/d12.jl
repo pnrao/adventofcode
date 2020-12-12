@@ -1,9 +1,10 @@
+using BenchmarkTools
 # Part 1
 
 struct ShipLoc
     sn::Int
     se::Int
-    o::Char
+    o::Char # one of E/N/W/S
 end
 
 Dirs="ENWS"
@@ -28,7 +29,7 @@ function scanfile1(f)
         i = parse(Int, s[2:end])
         loc = relocate(loc, c, i)
     end
-    @info loc
+    #@info loc
     return loc
 end
 
@@ -36,7 +37,9 @@ function manhattan(l)
     abs(l.sn)+abs(l.se)
 end
 
-manhattan(scanfile1("input12.txt"))|>println
+part1ship=@btime scanfile1("input12.txt")
+m=manhattan(part1ship)
+println("Part 1 manhattan distance = $m")
 
 
 # Part 2
@@ -68,8 +71,10 @@ function scanfile2(f)
         i = parse(Int, s[2:end])
         loc = waylocate(loc, c, i)
     end
-    @info loc
+    #@info loc
     return loc
 end
 
-manhattan(scanfile2("input12.txt"))|>println
+part2ship=@btime scanfile2("input12.txt")
+m=manhattan(part2ship)
+println("Part 2 manhattan distance = $m")
