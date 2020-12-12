@@ -1,4 +1,6 @@
 using BenchmarkTools
+# Part 1
+
 mutable struct ShipLoc
     sn::Int
     se::Int
@@ -19,6 +21,8 @@ function relocate!(sl, c, i)
     c=='R' && (sl.o=Dirs[mod1(o-angl,4)]; return)
     error("Invalid command $c$i")
 end
+
+# Part 2
 
 mutable struct ShipWayLoc
     sn::Int # ship locations
@@ -42,8 +46,14 @@ function waylocate!(swl, c, i)
     angl==3 && (swl.wn=-we; swl.we= wn; return)
 end
 
-function scanfile(f, loc, movemethod)
-    eachline(f).|>s->movemethod(loc, s[1], parse(Int, s[2:end]))
+# Combined
+
+input = readlines("input12.txt").|>s->(s[1],parse(Int, s[2:end]))
+
+function runcmds(cmds, loc, movemethod)
+    for cmd in cmds
+        movemethod(loc, cmd...)
+    end
     return loc
 end
 
@@ -51,10 +61,10 @@ function manhattan(l)
     abs(l.sn)+abs(l.se)
 end
 
-@btime scanfile("input12.txt", part1ship, relocate!) setup=(global part1ship = ShipLoc(0, 0, 'E'))
+@btime runcmds(input, part1ship, relocate!) setup=(global part1ship = ShipLoc(0, 0, 'E'))
 m=manhattan(part1ship)
 println("Part 1 manhattan distance = $m")
 
-@btime scanfile("input12.txt", part2ship, waylocate!) setup=(global part2ship=ShipWayLoc(0, 0, 1, 10))
+@btime runcmds(input, part2ship, waylocate!) setup=(global part2ship=ShipWayLoc(0, 0, 1, 10))
 m=manhattan(part2ship)
 println("Part 2 manhattan distance = $m")

@@ -22,26 +22,6 @@ function relocate(ol, c, i)
     error("Invalid command $c$i")
 end
 
-function scanfile1(f)
-    loc=ShipLoc(0, 0, 'E')
-    for s in eachline(f)
-        c = s[1]
-        i = parse(Int, s[2:end])
-        loc = relocate(loc, c, i)
-    end
-    #@info loc
-    return loc
-end
-
-function manhattan(l)
-    abs(l.sn)+abs(l.se)
-end
-
-part1ship=@btime scanfile1("input12.txt")
-m=manhattan(part1ship)
-println("Part 1 manhattan distance = $m")
-
-
 # Part 2
 
 struct ShipWayLoc
@@ -64,17 +44,26 @@ function waylocate(ol, c, i)
     error("Invalid command $c$i")
 end
 
-function scanfile2(f)
-    loc=ShipWayLoc(0, 0, 1, 10)
-    for s in eachline(f)
-        c = s[1]
-        i = parse(Int, s[2:end])
-        loc = waylocate(loc, c, i)
+# Combined
+
+function runcmds(cmds, loc, movemethod)
+    for cmd in cmds
+        loc=movemethod(loc, cmd...)
     end
     #@info loc
     return loc
 end
 
-part2ship=@btime scanfile2("input12.txt")
+function manhattan(l)
+    abs(l.sn)+abs(l.se)
+end
+
+input = readlines("input12.txt").|>s->(s[1],parse(Int, s[2:end]))
+
+@btime part1ship=runcmds(input, part1ship, relocate) setup=(global part1ship = ShipLoc(0, 0, 'E'))
+m=manhattan(part1ship)
+println("Part 1 manhattan distance = $m")
+
+@btime part2ship=runcmds(input, part2ship, waylocate) setup=(global part2ship=ShipWayLoc(0, 0, 1, 10))
 m=manhattan(part2ship)
 println("Part 2 manhattan distance = $m")
