@@ -1,21 +1,20 @@
-@inline @views function isfull(seats,r,c)
-    if checkbounds(Bool, seats, r, c)
-        seats[r,c]=='#' && return 1
-        return 0
+@views function isfull(seats,r,c)
+    if checkbounds(Bool, seats, r, c) && seats[r,c]=='#'
+        return 1
     else
         return 0
     end
 end
 
-@inline @views function adjacents1(seats, r, c)
-    isfull(seats,r-1,c-1)+
-    isfull(seats,r-1,c)+
-    isfull(seats,r-1,c+1)+
-    isfull(seats,r,c-1)+
-    isfull(seats,r,c+1)+
-    isfull(seats,r+1,c-1)+
-    isfull(seats,r+1,c)+
-    isfull(seats,r+1,c+1)
+@views function adjacents1(seats, r, c)
+    isfull(seats, r-1, c-1)+
+    isfull(seats, r-1, c  )+
+    isfull(seats, r-1, c+1)+
+    isfull(seats, r  , c-1)+
+    isfull(seats, r  , c+1)+
+    isfull(seats, r+1, c-1)+
+    isfull(seats, r+1, c  )+
+    isfull(seats, r+1, c+1)
 end
 
 @views function reshuffle1(seats)
@@ -44,21 +43,18 @@ newseats=reduce(vcat, permutedims.(collect.(readlines("input11.txt"))))
 end
 println("Final count for Part 1: ", count(==('#'), newseats))
 
-@inline @views function adjacentsdir(seats, r, c, rdir, cdir)
-    if checkbounds(Bool, seats, r+rdir, c+cdir)
-        if seats[r+rdir,c+cdir] == '#'
-            return 1
-        elseif seats[r+rdir,c+cdir] == 'L'
-            return 0
-        else
-            return adjacentsdir(seats, r+rdir, c+cdir, rdir, cdir)
-        end
-    else
+@views function adjacentsdir(seats, r, c, rdir, cdir)
+    checkbounds(Bool, seats, r+rdir, c+cdir) || return 0
+    if seats[r+rdir,c+cdir] == '#'
+        return 1
+    elseif seats[r+rdir,c+cdir] == 'L'
         return 0
+    else
+        return adjacentsdir(seats, r+rdir, c+cdir, rdir, cdir)
     end
 end
 
-@inline @views function adjacents2(seats, r, c)
+@views function adjacents2(seats, r, c)
     adjacentsdir(seats, r, c, -1, -1)+
     adjacentsdir(seats, r, c, -1,  0)+
     adjacentsdir(seats, r, c, -1, +1)+
@@ -95,3 +91,4 @@ newseats=reduce(vcat, permutedims.(collect.(readlines("input11.txt"))))
 end
 println("Final count for Part 2: ", count(==('#'), newseats))
 
+# println(join(String.(eachrow(newseats))),'\n')
