@@ -21,18 +21,16 @@ function part1()
             setval(adr, val)
         end
     end
-    @info "Part 1: $(sum(values(mem)))"
+    return sum(values(mem))
 end
-part1()
+println("Part 1: ", part1())
 
 function part2()
-    msk_xs  = []
+    msk_ors = []
     msk_and = 0
-    msk_or  = 0
     mem=Dict{Int,Int}()
     function setmask(m)
         msk_and = parse(UInt, replace(replace(m,r"0|1"=>"1"), "X"=>"0"), base=2)
-        msk_or  = parse(UInt,         replace(m,r"0|X"=>"0"),            base=2)
         xaddrs=[m]
         #@info "Part 2 input:" xaddrs[1] msk_and msk_or
         while 'X' ∈ xaddrs[1]
@@ -40,12 +38,12 @@ function part2()
             push!(xaddrs, replace(x, 'X'=>'0', count=1))
             push!(xaddrs, replace(x, 'X'=>'1', count=1))
         end
-        msk_xs=[parse(UInt, addr, base=2) for addr in xaddrs]
-        #@info "Part 2 addrs:" msk_xs
+        msk_ors=[parse(UInt, addr, base=2) for addr in xaddrs]
+        #@info "Part 2 addrs:" msk_ors
     end
     function setval(adr, val)
-        for x ∈ msk_xs
-            mem[(adr&msk_and)|msk_or|x] = val
+        for x ∈ msk_ors
+            mem[(adr&msk_and)|x] = val
         end
     end
 
@@ -60,6 +58,6 @@ function part2()
             setval(adr, val)
         end
     end
-    @info "Part 2: $(sum(values(mem)))"
+    return sum(values(mem))
 end
-part2()
+println("Part 2: ",part2())
