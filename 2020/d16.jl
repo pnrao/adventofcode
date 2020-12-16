@@ -1,25 +1,20 @@
 blocks = split(read("input16.txt", String), "\n\n")
-rules = Dict{String,Array{UnitRange{Int},1}}()
+rules = Dict{String,Vector{UnitRange{Int}}}()
 allranges = Set{UnitRange{Int}}()
 for line in split(blocks[1], "\n")
     chunks = split(line, r"(: )|( or )|-")
     lims = [parse(Int,x) for x in chunks[2:end]]
     rules[chunks[1]] = [lims[1]:lims[2], lims[3]:lims[4]]
-end
-
-for v in values(rules)
-    push!(allranges, v[1], v[2])
+    push!(allranges, lims[1]:lims[2], lims[3]:lims[4])
 end
 
 function looksgood(n::Int)
-    inrange = false
     for range in allranges
         if n ∈ range
-            inrange = true
-            break
+            return true
         end
     end
-    return inrange
+    return false
 end
 
 function part1()
@@ -64,10 +59,10 @@ function part2()
     while sum(length.(values(rulecolmatches))) > 20
         for (k,v) ∈ rulecolmatches
             if length(v) == 1
-                singl = pop!(copy(v))
+                s = only(v)
                 for k2 ∈ keys(rulecolmatches)
                     if k!=k2
-                        delete!(rulecolmatches[k2], singl)
+                        delete!(rulecolmatches[k2], s)
                     end
                 end
             end
@@ -78,7 +73,7 @@ function part2()
     departureprod=1
     for (k,v) ∈ rulecolmatches
         if startswith(k, "departure")
-            i = pop!(copy(v))
+            i = only(v)
             departureprod*=myticket[i]
         end
     end
