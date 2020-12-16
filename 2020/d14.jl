@@ -23,7 +23,7 @@ function part1()
     end
     return sum(values(mem))
 end
-println("Part 1: ", part1())
+println("Part 1: ", @time part1())
 
 function part2()
     msk_ors = []
@@ -60,4 +60,4 @@ function part2()
     end
     return sum(values(mem))
 end
-println("Part 2: ",part2())
+println("Part 2: ", @time part2())
