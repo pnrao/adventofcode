@@ -1,4 +1,3 @@
-using PrettyPrint
 blocks = split(read("input16.txt", String), "\n\n")
 rules = Dict{String,Array{UnitRange{Int},1}}()
 allranges = Set{UnitRange{Int}}()
@@ -32,13 +31,9 @@ function part1()
     return invalid_total
 end
 
-println("Part 1: ", part1())
-
-myticket = [parse(Int,m[1]) for m in eachmatch(r"(\d+)", blocks[2])]
-
-colrulematches = Dict()
 rulecolmatches = Dict()
 function part2()
+    myticket = [parse(Int,m[1]) for m in eachmatch(r"(\d+)", blocks[2])]
     tktstrs = split(blocks[3],"\n")[2:end]
     global nearbytkts = Matrix{Int}(undef,0,length(rules))
     for str in tktstrs
@@ -53,31 +48,25 @@ function part2()
             global nearbytkts = vcat(nearbytkts, ints')
         end
     end
-    println(size(nearbytkts))
     for col ∈ 1:length(rules), (name, range)∈rules
-        colrulematch = true
+        rulecolmatch = true
         for e in nearbytkts[:,col]
             if e∉range[1] && e∉range[2]
-                colrulematch = false
+                rulecolmatch = false
                 break
             end
         end
-        if colrulematch
-            #println("column $col matches rule $name")
+        if rulecolmatch
             push!(get!(rulecolmatches, name, Set{Int}()), col)
-            push!(get!(colrulematches, col, Set{String}()), name)
         end
     end
-    #@info "Init" rulecolmatches
-    #@info colrulematches
     i=0
     while sum(length.(values(rulecolmatches))) > 20
         for (k,v) ∈ rulecolmatches
             if length(v) == 1
                 singl = pop!(copy(v))
                 for k2 ∈ keys(rulecolmatches)
-                    if k!=k2 #&& v[1] ∈ rulecolmatches[k2]
-                        #println("trying to delete $(singl) from $(rulecolmatches[k2])")
+                    if k!=k2
                         delete!(rulecolmatches[k2], singl)
                     end
                 end
@@ -85,23 +74,7 @@ function part2()
         end
         i+=1
     end
-    @info "Settled after $i iterations" rulecolmatches
-    i=0
-    while sum(length.(values(colrulematches))) > 20
-        for (k,v) ∈ colrulematches
-            if length(v) == 1
-                singl = pop!(copy(v))
-                for k2 ∈ keys(colrulematches)
-                    if k!=k2 #&& v[1] ∈ rulecolmatches[k2]
-                        #println("trying to delete $(singl) from $(rulecolmatches[k2])")
-                        delete!(colrulematches[k2], singl)
-                    end
-                end
-            end
-        end
-        i+=1
-    end
-    @info "Settled after $i iterations" colrulematches
+    #@info "Settled after $i iterations" rulecolmatches
     departureprod=1
     for (k,v) ∈ rulecolmatches
         if startswith(k, "departure")
@@ -112,4 +85,5 @@ function part2()
     return departureprod
 end
 
-part2()
+println("Part 1: ", @time part1())
+println("Part 2: ", @time part2())
