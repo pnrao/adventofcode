@@ -1,35 +1,35 @@
+const DIMS=4 # run-time initialization of unit and window slows down code
 function makeinit(file)
     str=read(file, String)
-    carts = Set{CartesianIndex{4}}()
+    carts = Set{CartesianIndex{DIMS}}()
     for (y,s) in enumerate(split(str,"\n"))
         for (x, c) in enumerate(s)
             if c == '#'
-                push!(carts, CartesianIndex(x,y,0,0))
+                cart = zeros(Int, DIMS)
+                cart[1] = x
+                cart[2] = y
+                push!(carts, CartesianIndex(Tuple(cart)))
             end
         end
     end
     return carts
 end
 
-const unit=CartesianIndex(1,1,1,1)
+const unit=CartesianIndex{DIMS}()
 function nextextrema(arr)
     e = extrema(arr)
     return (e[1]-unit, e[2]+unit)
 end
 
-const window = setdiff(collect(CartesianIndex(-1, -1, -1, -1):
-                               CartesianIndex(1, 1, 1, 1)),
-                       [CartesianIndex(0, 0, 0, 0)])
+const window = setdiff(collect(-unit:unit),[0*unit])
 windowof(p::CartesianIndex)=Set(map(x->x+p, window))
 
 function next(active)
-    nextactive=Set{CartesianIndex{4}}()
+    nextactive=Set{CartesianIndex{DIMS}}()
     ne = nextextrema(active)
     for p ∈ ne[1]:ne[2]
         actneighbrs = length(intersect(active, windowof(p)))
-        if p∈active && 2 ≤ actneighbrs ≤ 3
-            push!(nextactive, p)
-        elseif p∉active && actneighbrs == 3
+        if (p∈active && 2 ≤ actneighbrs ≤ 3) || (p∉active && actneighbrs == 3)
             push!(nextactive, p)
         end
     end
