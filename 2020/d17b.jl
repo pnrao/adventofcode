@@ -16,7 +16,7 @@ function makeinit(file)
 end
 
 const unit=CartesianIndex{DIMS}()
-function nextextrema(arr)
+@views function nextextrema(arr)
     e = extrema(arr)
     return (e[1]-unit, e[2]+unit)
 end
@@ -24,7 +24,7 @@ end
 const window = setdiff(collect(-unit:unit),[0*unit])
 windowof(p::CartesianIndex)=Set(map(x->x+p, window))
 
-function next(active)
+@views function next(active)
     nextactive=Set{CartesianIndex{DIMS}}()
     ne = nextextrema(active)
     for p ∈ ne[1]:ne[2]
