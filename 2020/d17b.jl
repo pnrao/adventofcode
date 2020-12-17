@@ -29,8 +29,7 @@ end
 
 @views function next(active)
     nextactive=Set{CartesianIndex{DIMS}}()
-    nl = nextlocations(active)
-    for p ∈ nl
+    for p ∈ nextlocations(active)
         actneighbrs = length(intersect(active, windowof(p)))
         if (p∈active && 2 ≤ actneighbrs ≤ 3) || (p∉active && actneighbrs == 3)
             push!(nextactive, p)
