@@ -16,18 +16,21 @@ function makeinit(file)
 end
 
 const unit=CartesianIndex{DIMS}()
-@views function nextextrema(arr)
-    e = extrema(arr)
-    return (e[1]-unit, e[2]+unit)
-end
-
 const window = setdiff(collect(-unit:unit),[0*unit])
 windowof(p::CartesianIndex)=Set(map(x->x+p, window))
 
+@views function nextlocations(arr)
+    nxtloc = copy(arr)
+    for p in arr
+        union!(nxtloc, windowof(p))
+    end
+    return nxtloc
+end
+
 @views function next(active)
     nextactive=Set{CartesianIndex{DIMS}}()
-    ne = nextextrema(active)
-    for p ∈ ne[1]:ne[2]
+    nl = nextlocations(active)
+    for p ∈ nl
         actneighbrs = length(intersect(active, windowof(p)))
         if (p∈active && 2 ≤ actneighbrs ≤ 3) || (p∉active && actneighbrs == 3)
             push!(nextactive, p)
