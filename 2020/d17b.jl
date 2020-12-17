@@ -36,9 +36,11 @@ function next(active)
     return nextactive
 end
 
-actives=makeinit("input17.txt")
-for i∈1:6
-    global actives=next(actives)
+function main(file, times)
+    actives=makeinit(file)
+    for i∈1:times
+        actives=next(actives)
+    end
+    return length(actives)
 end
-
-println(length(actives))
+println(@time main("input17.txt", 6))
