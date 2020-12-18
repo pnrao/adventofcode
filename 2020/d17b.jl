@@ -5,10 +5,7 @@ function makeinit(file)
     for (y,s) in enumerate(split(str,"\n"))
         for (x, c) in enumerate(s)
             if c == '#'
-                cart = zeros(Int, DIMS)
-                cart[1] = x
-                cart[2] = y
-                push!(carts, CartesianIndex(Tuple(cart)))
+                push!(carts, CartesianIndex{DIMS}(x,y))
             end
         end
     end
