@@ -1,6 +1,6 @@
 const BASE=0x1f300
-atoP(s)=Char(parse(Int, s)+BASE)
-mykey(n)=Char(n+BASE)
+atoP(s)=Char(parse(Int, s)+BASE) # ascii digit sequence to pictograph
+mykey(n)=Char(n+BASE) # ∵ all my keys are pictographs
 
 function readinput(file)
     blck = split(read(file, String), "\n\n")
@@ -32,13 +32,14 @@ function grok!(rules)
     while modified
         modified=false
         for rn in keys(rules)
-            oldr = rules[rn]
             newr = rules[rn]
             for qn in keys(rules)
+                # it's faster to check only the used rules,
+                # but I don't care.
                 newr = replace(newr, qn=>rules[qn])
             end
             newr = replace(newr, r"«(\w+)»"=>s"\1")
-            if oldr != newr
+            if rules[rn] != newr
                 modified=true
                 rules[rn] = newr
             end
