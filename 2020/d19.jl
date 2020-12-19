@@ -2,14 +2,13 @@ atoi(s)=parse(Int, s)
 
 function readinput(file)
     blck = split(read(file, String), "\n\n")
-    # Rules
     rul = Dict()
     for l in split(blck[1], '\n')
         rh,rt = split(l, ": ", limit=2)
         rnum = atoi(rh)
         rul[rnum] = []
         grp = occursin("|", rt)
-        if grp push!(rul[rnum], "((") end
+        if grp push!(rul[rnum], "(?:(?:") end
         for frag in split(rt)
             if frag[1] == '"'
                 push!(rul[rnum], strip(frag, '"'))
@@ -21,14 +20,23 @@ function readinput(file)
         end
         if grp push!(rul[rnum], "))") end
     end
-    # Messages
     msg = split(blck[2], '\n')
     return rul, msg
 end
 
 function lookup(rules, rfrag)
     if typeof(rfrag)<:Int
-        return ["(", rules[rfrag], ")"]
+        newrl = rules[rfrag]
+        #@info typeof(newrl) newrl
+        if typeof(newrl)<:Char
+            return String(newrl)
+        else
+            if occursin("|", join(newrl))
+                return ["(?:", newrl, ")"]
+            else
+                return newrl
+            end
+        end
     elseif typeof(rfrag)<:Array
         newlu = []
         for i in rfrag
@@ -66,7 +74,7 @@ function regexify(rule)
     newlen = oldlen+1
     while newlen!=oldlen
         oldlen=length(str)
-        str = replace(str, r"\((\w+)\)"=>s"\1")
+        str = replace(str, r"\(\?:(\w+)\)"=>s"\1")
         newlen=length(str)
     end
     str='^'*str*'$'
@@ -83,12 +91,27 @@ end
 
 function main()
     rls,msgs = readinput("input19.txt")
-    #printrules(rls)
     grok!(rls)
-    #printrules(rls)
-    newrules = restring(rls)
-    s = sum([occursin(newrules[0], msg) for msg in msgs])
+    regexrules = restring(rls)
+    s = sum([occursin(regexrules[0], msg) for msg in msgs])
     println("Part 1: $s")
+    rls,msgs = readinput("input19.txt")
+    rls[8]  = ["(?:(?:", 42,")+)"]
+    rls[11] = ["(?:",
+    "(?:(?:", 42, "{1})(?:", 31, "{1}))|",
+    "(?:(?:", 42, "{2})(?:", 31, "{2}))|",
+    "(?:(?:", 42, "{3})(?:", 31, "{3}))|",
+    "(?:(?:", 42, "{4})(?:", 31, "{4}))|",
+#    "(?:(?:", 42, "{5})(?:", 31, "{5}))|",
+#    "(?:(?:", 42, "{6})(?:", 31, "{6}))|",
+#    "(?:(?:", 42, "{7})(?:", 31, "{7}))|",
+#    "(?:(?:", 42, "{8})(?:", 31, "{8}))|",
+#    "(?:(?:", 42, "{9})(?:", 31, "{9}))|",
+    ")"]
+    grok!(rls)
+    regexrules = restring(rls)
+    s = sum([occursin(regexrules[0], msg) for msg in msgs])
+    println("Part 2: $s")
     return
 end
 main()
