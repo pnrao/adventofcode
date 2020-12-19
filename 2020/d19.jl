@@ -3,7 +3,7 @@ atoi(s)=parse(Int, s)
 function readinput(file)
     blck = split(read(file, String), "\n\n")
     # Rules
-    rul = Dict{Int, Array}()
+    rul = Dict()
     for l in split(blck[1], '\n')
         rh,rt = split(l, ": ", limit=2)
         rnum = atoi(rh)
@@ -64,7 +64,7 @@ function regexify(rule)
     str = rule
     oldlen = length(str)
     newlen = oldlen+1
-    while newlen>oldlen
+    while newlen!=oldlen
         oldlen=length(str)
         str = replace(str, r"\((\w+)\)"=>s"\1")
         newlen=length(str)
