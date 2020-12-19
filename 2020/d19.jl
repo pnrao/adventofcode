@@ -13,7 +13,7 @@ function readinput(file)
             if frag[1] == '"'
                 push!(rul[rnum], strip(frag, '"'))
             elseif frag[1] == '|'
-                push!(rul[rnum], ")|(")
+                push!(rul[rnum], ")|(?:")
             else
                 push!(rul[rnum], atoi(frag))
             end
