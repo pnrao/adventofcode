@@ -1,6 +1,6 @@
 function readfoodfile(file)
     food = []
-    for l in split(read(file, String), '\n')
+    for l in eachline(file)
         ingredients = Set{String}()
         allergens   = Set{String}()
         isingr = true
@@ -36,10 +36,12 @@ function findingalg(fdlist)
     nalg = length(allalg)
     while length(ingall) < nalg
         for i in 1:length(food), j in 1:length(food)
-            if isempty(food[i].ing)
-                deleteat!(food, i)
+            if isempty(food[j].ing)
+                #@info "delete empty"
+                deleteat!(food, j)
                 break
             elseif length(food[i].ing) == 1 && length(food[i].alg) == 1
+                #@info "delete unique map"
                 ing = only(food[i].ing)
                 alg = only(food[i].alg)
                 ingall[ing] = alg
@@ -55,7 +57,6 @@ function findingalg(fdlist)
                     alg = only(commona)
                     ingall[ing] = alg
                     scrubfoodlist(food, ing, alg)
-                    break
                 elseif length(commoni) >= 1 && length(commona) >= 1 &&
                         (ing=commoni, alg=commona) ∉ food
                     push!(food, (ing=commoni, alg=commona))
@@ -69,8 +70,7 @@ end
 function main()
     input = "input21.txt"
     food = readfoodfile(input)
-    ingalg = findingalg(food)
-    food = readfoodfile(input)
+    ingalg = @time findingalg(food)
     for k in keys(ingalg)
         scrubfoodlist(food, k, ingalg[k])
     end
