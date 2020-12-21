@@ -26,45 +26,51 @@ function scrubfoodlist(fl, ing, alg)
     end
 end
 
-function findingalg(fdlist)
+@views function findingalg(fdlist)
     food = deepcopy(fdlist)
-    ingall = Dict{String,String}()
+    ingalg = Dict{String,String}()
     allalg = Set()
     for k in 1:length(food)
         union!(allalg, food[k].alg)
     end
     nalg = length(allalg)
-    while length(ingall) < nalg
-        for i in 1:length(food), j in 1:length(food)
-            if isempty(food[j].ing)
-                #@info "delete empty"
-                deleteat!(food, j)
-                break
-            elseif length(food[i].ing) == 1 && length(food[i].alg) == 1
+    while length(ingalg) < nalg
+        useless = []
+        for i in 1:length(food)
+            isempty(food[i].ing) && push!(useless, i)
+            isempty(food[i].alg) && push!(useless, i)
+        end
+        sort!(useless)
+        unique!(useless)
+        deleteat!(food, useless)
+        for i in 1:length(food)-1, j in i+1:length(food)
+            if length(food[i].ing) == 1 && length(food[i].alg) == 1
                 #@info "delete unique map"
                 ing = only(food[i].ing)
                 alg = only(food[i].alg)
-                ingall[ing] = alg
+                ingalg[ing] = alg
                 deleteat!(food, i)
                 scrubfoodlist(food, ing, alg)
                 break
-            elseif i!=j
-                commoni = intersect(food[i].ing, food[j].ing)
+            else
                 commona = intersect(food[i].alg, food[j].alg)
-                isempty(commoni) || isempty(commona) && continue
+                isempty(commona) && continue
+                commoni = intersect(food[i].ing, food[j].ing)
+                isempty(commoni) && continue
                 if length(commoni) == 1 && length(commona) == 1
                     ing = only(commoni)
                     alg = only(commona)
-                    ingall[ing] = alg
+                    ingalg[ing] = alg
                     scrubfoodlist(food, ing, alg)
-                elseif length(commoni) >= 1 && length(commona) >= 1 &&
-                        (ing=commoni, alg=commona) ∉ food
+                elseif (ing=commoni, alg=commona) ∉ food
+                    #@info "adding" commoni commona
                     push!(food, (ing=commoni, alg=commona))
                 end
             end
         end
     end
-    return ingall
+    #@info length(food)
+    return ingalg
 end
 
 function main()
