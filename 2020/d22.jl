@@ -21,8 +21,9 @@ function score(deck1, deck2)
     return s
 end
 
-function recursivecombat(deck1, deck2, oldrounds=Set())
+function recursivecombat(deck1, deck2)
     winner = 0
+    oldrounds=Set()
     while length(deck1)*length(deck2) > 0
         if [deck1,deck2] ∈ oldrounds
             return 1
