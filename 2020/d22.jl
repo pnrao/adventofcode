@@ -17,8 +17,7 @@ function part1(deck1, deck2)
 end
 
 function score(deck1, deck2)
-    winner = isempty(deck1) ? deck2 : deck1
-    s = sum([i*v for (i,v) in enumerate(reverse(winner))])
+    s = sum([i*v for (i,v) in enumerate(reverse(vcat(deck1,deck2)))])
     return s
 end
 
