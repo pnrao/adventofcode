@@ -13,7 +13,7 @@ function move(cups, curloc)
             pick[i] = popat!(cups, curloc+1)
         else
             pick[i] = popat!(cups, 1)
-            deletedat1+=1
+            deletedat1 += 1
         end
     end
 
@@ -39,10 +39,8 @@ function part1()
     start="157623984"
     cups = (collect(start).|>c->parse(Int,c))
     curloc = 1
-    #@info "cups $(join(cups,',')) ($curloc)"
     for _ ∈ 1:100
         curloc=move(cups, curloc)
-        #@info "cups $(join(cups,',')) ($curloc)"
     end
     while cups[1] != 1
         rotateview(cups)
@@ -56,19 +54,21 @@ println("Part 1: ", join(cs[2:end]))
 function part2()
     start="157623984"
     cups = (collect(start).|>c->parse(Int,c))
-    curr = cups[1]
-    append!(cups, collect(10:1000000))
+    curloc = 1
+    append!(cups, collect(10:1_000_000))
     st = time_ns()
-    for i ∈ 1:100000
-        if i ∈ [10,100,1000,10000,100000,1000000,2000000,3000000,4000000,5000000,6000000,7000000,8000000,9000000,10000000]
+    for i ∈ 1:1_000_000
+        if i ∈ [10,100,1_000,10_000,100_000,
+            1_000_000,2_000_000,3_000_000,4_000_000,
+            5_000_000,6_000_000,7_000_000,8_000_000,
+            9_000_000,10_000_000]
             lt = (time_ns()-st)*1e-9
             @info "move $i $lt"
         end
-        curr=move(cups, curr)
-        #@info "cups $(join(cups,',')) ($curr)"
+        curloc=move(cups, curloc)
     end
     loc=findfirst(==(1), cups)
     return cups[loc+1]*cups[loc+2]
 end
 
-println("Part 2: ", @time part2())
+#println("Part 2: ", @time part2())
