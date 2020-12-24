@@ -1,4 +1,3 @@
-using PrettyPrint
 function parsesteps(s)
     steps = []
     i=1
@@ -15,54 +14,80 @@ function parsesteps(s)
     return steps
 end
 
-function steptocoord(step)
-    if step == "e"
-        return  1.0000001+.0im
-    elseif step == "w"
-        return -0.9999999+.0im
-    elseif step == "ne"
-        return (cosd( 60)+im*sind( 60)+.0000001im)
-    elseif step == "nw"
-        return (cosd(120)+im*sind(120)+.0000001im)
-    elseif step == "sw"
-        return (cosd(240)+im*sind(240)+.0000001im)
-    elseif step == "se"
-        return (cosd(300)+im*sind(300)+.0000001im)
-    else
-        @error "invalid step"
-    end
-end
+const center = (1+im)*1e4
+const scale = 1e3
+const neighbors=[
+    Complex{Float32}(scale*( 1.      +.0im)),
+    Complex{Float32}(scale*(-1.      +.0im)),
+    Complex{Float32}(scale*(cosd( 60)+im*sind( 60))),
+    Complex{Float32}(scale*(cosd(120)+im*sind(120))),
+    Complex{Float32}(scale*(cosd(240)+im*sind(240))),
+    Complex{Float32}(scale*(cosd(300)+im*sind(300)))]
 
 function goto(steps)
-    pacc = 0.0
-    for step in steps
-        pacc += steptocoord(step)
-    end
-    #return Complex{Float16}(pacc) # round it down for comparisons
-    return round(pacc, digits=7, base=2)
-end
-
-function newgoto(steps)
+    # ∵ crossing the axes gets results like +0.0im != -0.0im
     pe = count(==( "e"), steps)-count(==( "w"), steps)
     pne= count(==("ne"), steps)-count(==("sw"), steps)
     pnw= count(==("nw"), steps)-count(==("se"), steps)
-    p  = pe + pne*(cosd( 60)+im*sind( 60)) +
+    p  = center + pe + pne*(cosd( 60)+im*sind( 60)) +
               pnw*(cosd(120)+im*sind(120))
-    return Complex{Float16}(p) # round it down for comparisons
+    return Complex{Float32}(scale*p) # round it down for comparisons
 end
 
-dirs = []
-for l in eachline("input24.txt")
-    push!(dirs, parsesteps(l))
-end
-tiles = Dict{Complex{Float16},Bool}()
-for dir in dirs
-    p = newgoto(dir)
-    v=get!(tiles, p, true)
-    tiles[p] = !v
-end
-for (i,tile) in enumerate(pairs(tiles))
-    println(i,'\t',tile)
+function parsefile(file)
+    dirs = []
+    for l in eachline(file)
+        push!(dirs, parsesteps(l))
+    end
+    tiles = Dict{Complex{Float32},Bool}()
+    for dir in dirs
+        p = goto(dir)
+        v=get!(tiles, p, false)
+        tiles[p] = !v
+    end
+    return tiles
 end
 
-println("Part 1: ", sum([v==false for v in values(tiles)]))
+function countblacks(tiles)
+    # white = false, black = true
+    return sum(values(tiles))
+end
+
+function nextgen(tiles)
+    newtiles = copy(tiles)
+    for t in keys(tiles)
+        for nbr in neighbors
+            if tiles[t]
+                get!(newtiles, t+nbr, false)
+            end
+        end
+    end
+    for t in keys(newtiles)
+        nbrcnt = sum([get(tiles, t+n, false) for n in neighbors])
+        originalcolor = get(tiles, t, false)
+        if originalcolor && (nbrcnt==0 || nbrcnt>2) # was black
+             newtiles[t] = false
+        elseif !originalcolor && nbrcnt == 2 # was white
+            newtiles[t] = true
+        end
+    end
+    return newtiles
+end
+
+function main()
+    ts = parsefile("input24.txt")
+    part1 = countblacks(ts)
+    for i in 1:100
+        ts = nextgen(ts)
+        #println(i,'\t', length(ts), '\t', countblacks(ts))
+    end
+    part2 = countblacks(ts)
+    pts = collect(keys(ts))
+    # fiddle with center and scale if the extrema cross the axes
+    # println("x extrema: ", extrema(real(pts)))
+    # println("y extrema: ", extrema(imag(pts)))
+    return part1, part2
+end
+p1,p2 = @time main()
+println("Part 1: ", p1)
+println("Part 2: ", p2)
