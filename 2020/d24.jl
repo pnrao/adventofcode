@@ -82,7 +82,7 @@ function main()
         #println(i,'\t', length(ts), '\t', countblacks(ts))
     end
     part2 = countblacks(ts)
-    pts = collect(keys(ts))
+    #pts = collect(keys(ts))
     # fiddle with center and scale if the extrema cross the axes
     # println("x extrema: ", extrema(real(pts)))
     # println("y extrema: ", extrema(imag(pts)))
