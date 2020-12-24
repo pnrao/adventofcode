@@ -10,12 +10,13 @@ function parsesteps(s)
             i += 1
         end
     end
-    @assert join(steps) == s
+    #@assert join(steps) == s
     return steps
 end
 
 const center = (1+im)*1e4
 const scale = 1e3
+# ∵ crossing the axes gets results like +0.0im != -0.0im
 const neighbors=(
     e =Complex{Float32}(scale*( 1.      +.0im)),
     w =Complex{Float32}(scale*(-1.      +.0im)),
@@ -25,7 +26,6 @@ const neighbors=(
     se=Complex{Float32}(scale*(cosd(300)+im*sind(300))))
 
 function goto(steps)
-    # ∵ crossing the axes gets results like +0.0im != -0.0im
     pe = count(==( "e"), steps)-count(==( "w"), steps)
     pne= count(==("ne"), steps)-count(==("sw"), steps)
     pnw= count(==("nw"), steps)-count(==("se"), steps)
