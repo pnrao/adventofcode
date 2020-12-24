@@ -16,22 +16,22 @@ end
 
 const center = (1+im)*1e4
 const scale = 1e3
-const neighbors=[
-    Complex{Float32}(scale*( 1.      +.0im)),
-    Complex{Float32}(scale*(-1.      +.0im)),
-    Complex{Float32}(scale*(cosd( 60)+im*sind( 60))),
-    Complex{Float32}(scale*(cosd(120)+im*sind(120))),
-    Complex{Float32}(scale*(cosd(240)+im*sind(240))),
-    Complex{Float32}(scale*(cosd(300)+im*sind(300)))]
+const neighbors=(
+    e =Complex{Float32}(scale*( 1.      +.0im)),
+    w =Complex{Float32}(scale*(-1.      +.0im)),
+    ne=Complex{Float32}(scale*(cosd( 60)+im*sind( 60))),
+    nw=Complex{Float32}(scale*(cosd(120)+im*sind(120))),
+    sw=Complex{Float32}(scale*(cosd(240)+im*sind(240))),
+    se=Complex{Float32}(scale*(cosd(300)+im*sind(300))))
 
 function goto(steps)
     # ∵ crossing the axes gets results like +0.0im != -0.0im
     pe = count(==( "e"), steps)-count(==( "w"), steps)
     pne= count(==("ne"), steps)-count(==("sw"), steps)
     pnw= count(==("nw"), steps)-count(==("se"), steps)
-    p  = center + pe + pne*(cosd( 60)+im*sind( 60)) +
-              pnw*(cosd(120)+im*sind(120))
-    return Complex{Float32}(scale*p) # round it down for comparisons
+    p  = center*scale + pe*neighbors.e + pne*neighbors.ne +
+              pnw*neighbors.nw
+    return Complex{Float32}(p) # rounding it down for comparisons
 end
 
 function parsefile(file)
