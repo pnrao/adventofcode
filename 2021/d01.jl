@@ -14,7 +14,7 @@ global depths = readinput()
 		if d>prev incs +=1 end
 		prev = d
 	end
-	println("Part 1: ", incs)
+	return incs
 end
 
 @time function part2()
@@ -23,8 +23,8 @@ end
 	for i in 1:length(depths)-3
 		if depths[i]<depths[i+3] incs +=1 end
 	end
-	println("Part 2: ", incs)
+	return incs
 end
 
-part1()
-part2()
+@show part1()
+@show part2()
