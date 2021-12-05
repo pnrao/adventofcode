@@ -3,7 +3,6 @@ try include("preamble.jl") catch end
 function parseinput(file)
 	nums = []
 	for l in eachline(file)
-		if l[1] == '#' continue end
 		x1,y1,x2,y2=split(l,r"[^\d]+").|>s->parse(Int,s)
 		push!(nums,(x1,y1,x2,y2))
 	end
