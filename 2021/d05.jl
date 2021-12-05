@@ -1,13 +1,6 @@
 try include("preamble.jl") catch end
 
-function parseinput(file)
-	nums = []
-	for l in eachline(file)
-		x1,y1,x2,y2=split(l,r"[^\d]+").|>s->parse(Int,s)
-		push!(nums,(x1,y1,x2,y2))
-	end
-	return nums
-end
+parseinput(file)=[(split(l,r"[^\d]+").|>s->parse(Int,s)) for l in eachline(file)]
 
 function bothparts(list, dodiag=false)
 	d = Dict{Tuple, Int}()
