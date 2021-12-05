@@ -1,14 +1,10 @@
 try include("preamble.jl") catch end
 using DelimitedFiles
 
-function parseinput(input)
-	local top, boards
-	open(input) do f
-		top = Vector{Int8}(Meta.parse(readline(f)).args)
-		boards = [readdlm(IOBuffer(bl), Int8) for bl in split(read(f, String), "\n\n")]
-	end;
-	return top, boards
-end
+parseinput(input) = open(input) do f
+	Vector{Int8}(Meta.parse(readline(f)).args),
+	[readdlm(IOBuffer(bl), Int8) for bl in split(read(f, String), "\n\n")]
+end;
 
 function isbingo(board)
 	n = size(board)[1]
