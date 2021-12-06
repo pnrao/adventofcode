@@ -1,25 +1,31 @@
 try include("preamble.jl") catch end
 
-fish =[3,4,3,1,2]
+sample =[3,4,3,1,2]
 
 function spawnfish(fish, days)
+	fishdic = Dict((i=>0 for i in 0:8))
+	for f in fish
+		fishdic[f]+=1
+	end
 	for d ∈ 1:days
-		for i ∈ 1:length(fish)
-			if fish[i] == 0
-				fish[i] = 6
-				push!(fish, 8)
+		newdic = Dict((i=>0 for i in 0:8))
+		for k ∈ keys(fishdic)
+			if k==0
+				newdic[6]+=fishdic[0]
+				newdic[8] =fishdic[0]
 			else
-				fish[i]-=1
+				newdic[k-1]+=fishdic[k]
 			end
 		end
+		fishdic = newdic
 	end
-	return length(fish)
+	return sum(values(fishdic))
 end
 
 input = parse.(Int,split(readline("input06.txt"),','))
-@time sample18 = spawnfish([3,4,3,1,2],18)
+@time sample18 = spawnfish(sample,18)
 @show sample18
-@time sample80 = spawnfish([3,4,3,1,2],80)
+@time sample80 = spawnfish(sample,80)
 @show sample80
 @time part1=spawnfish(copy(input), 80)
 @show part1
