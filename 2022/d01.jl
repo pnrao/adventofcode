@@ -1,5 +1,5 @@
 include("../preamble.jl")
-#progdir = dirname(abspath(joinpath(".", @__FILE__)))
+isdefined(Base, :progdir) || (progdir = dirname(abspath(joinpath(".", @__FILE__))))
 function getmaxtotal()
     thistotal = 0
     maxcals = zeros(Int, 3)
@@ -18,7 +18,6 @@ function getmaxtotal()
     maxcals
 end
 
-#println("Part 1: $(getmaxtotal())")
 m = getmaxtotal()
 println("Part 1: ", m[1])
 println("Part 2: ", sum(m))
