@@ -2,15 +2,19 @@ include("../preamble.jl")
 isdefined(Base, :progdir) || (progdir = dirname(abspath(joinpath(".", @__FILE__))))
 function getmaxtotal()
     thistotal = 0
-    maxcals = zeros(Int, 3)
+    Nelfs = 3
+    maxcals = zeros(Int, Nelfs)
     for l in eachline("$(progdir)/input01.txt")
         try
             thistotal += parse(Int, l)
         catch e
             i = searchsortedfirst(maxcals, thistotal, rev=true)
-            if i < length(maxcals)
+            if i < Nelfs
                 insert!(maxcals, i, thistotal)
-                maxcals = maxcals[1:3]
+                n = length(maxcals)
+                if n > Nelfs
+                    deleteat!(maxcals, Nelfs+1:n)
+                end
             end
             thistotal = 0
         end
