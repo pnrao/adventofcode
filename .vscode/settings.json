@@ -1,3 +1,6 @@
 {
-	"workbench.colorTheme": "Julia (Monokai Classic)"
+	"workbench.colorTheme": "Julia (Monokai Classic)",
+	"spellright.ignoreRegExps": [
+		"/\\d+/g",
+	]
 }

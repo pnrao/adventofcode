@@ -1,5 +1,8 @@
-include("../preamble.jl")
-isdefined(Base, :progdir) || (progdir = dirname(abspath(joinpath(".", @__FILE__))))
+try
+    include("../preamble.jl")
+catch
+    progdir = dirname(abspath(joinpath(".", @__FILE__)))
+end
 function getmaxtotal()
     thistotal = 0
     Nelfs = 3
