@@ -1,4 +1,3 @@
-#!/usr/bin/env julia
 try
 	include("../preamble.jl")
 catch

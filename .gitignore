@@ -3,3 +3,16 @@
 input*.txt
 cookie.txt
 Manifest.toml
+
+# Elixir / Mix
+_build/
+deps/
+erl_crash.dump
+mix.lock
+.elixir_ls/
+*.ez
+*.log
+
+# OTP releases
+/rel/
+/releases/
