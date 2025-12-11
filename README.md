@@ -38,17 +38,26 @@ julia --project=.. d01.jl
 
 ### Elixir Solutions
 
-From the repository root, run an Elixir day script. The input is downloaded automatically and the solution runs.
+**Run from CLI (specific day):**
 
 ```zsh
-elixir -S mix run 2025/d01.ex
+mix advent.run 2025 1
 ```
 
-**From inside a year directory:**
+**Debug in VSCode (current file):**
+
+1. Install the **ElixirLS** extension.
+2. Open any day file (e.g., `2025/d02.ex`).
+3. Set breakpoints.
+4. Press **F5** to launch the debugger.
+
+The debugger will execute the active file's `run/0` or `run/1` entrypoint with full step-through and variable inspection.
+
+**Interactive REPL:**
 
 ```zsh
-cd 2025
-elixir -S mix run d01.ex
+iex -S mix
+iex> AdventOfCode.Runner.run(2025, 1)
 ```
 
 ## How Input Download Works
@@ -60,10 +69,12 @@ elixir -S mix run d01.ex
 - If the input file already exists, it is **not** re-downloaded.
 
 ### Elixir (`lib/adventofcode.ex`)
-- Call `AdventOfCode.read_input()` from a day script (e.g., `2025/d01.ex`).
-- The library inspects the caller's stack frame to determine the year (from the parent directory name, e.g., `2025`) and day (from digits in the filename, e.g., `d01` → day 1).
+- Call `AdventOfCode.read_input()` from a day module to download and read the input.
+- The library auto-detects the year/day from:
+  1. The stacktrace (parent directory name for year, filename digits for day),
+  2. Environment variable fallback (`ADVENT_YEAR`, `ADVENT_DAY`) when called via debugger or Mix tasks.
 - Searches for `cookie.txt` in the repository root (or parent directories).
-- Downloads the input if not already present and returns the file contents.
+- Downloads the input if not already present and caches it locally.
 
 ## Session Cookie
 
@@ -121,9 +132,7 @@ Then run: `julia --project=. YYYY/dDD.jl`
 Create a new file `YYYY/dDD.ex`:
 
 ```elixir
-input = AdventOfCode.read_input()
-
-defmodule DayDD do
+defmodule AdventOfCode.YYYYY.DayDD do
   def part1(input) do
     # your solution here
   end
@@ -131,16 +140,32 @@ defmodule DayDD do
   def part2(input) do
     # your solution here
   end
-end
 
-IO.puts(DayDD.part1(input))
-IO.puts(DayDD.part2(input))
+  def run do
+    input = AdventOfCode.read_input() |> String.trim()
+    IO.puts(part1(input))
+    IO.puts(part2(input))
+  end
+end
 ```
 
-Then run: `elixir -S mix run YYYY/dDD.ex`
+Then run with:
+
+```bash
+mix advent.run YYYY DD
+```
+
+Or debug in VSCode by opening the file and pressing **F5**.
+
+## Elixir Tools
+
+- **`mix advent.run YEAR DAY`**: Run a specific day's solution.
+- **`mix advent.run_script PATH`**: Run a single script file in isolation (used by VSCode debugger).
+- **`AdventOfCode.Runner.run(year, day)`**: Programmatically run a day from `iex`.
+- **`AdventOfCode.read_input(year, day, dir)` or `AdventOfCode.read_input()`**: Download and return the input for a day.
 
 ## Notes
 
-- **No Version Pinning**: Dependencies are kept to their latest compatible versions. Update with `mix deps.get` (Elixir) or `Pkg.instantiate()` (Julia) as new releases come out.
-- **Benchmarking** (Elixir/Julia): Both projects support `BenchmarkTools.jl` (Julia) and `Benchmarks` via Elixir libraries. See respective docs for timing solutions.
-- **Floating Dependencies**: Input files (`input*.txt`) and build artifacts are ignored in `.gitignore`, so only your solution code is committed.
+- **No Version Pinning**: Dependencies are kept to their latest compatible versions. Update with `mix deps.get` (Elixir) or `Pkg.instantiate()` (Julia).
+- **Input Files**: Downloaded inputs are cached in `YYYY/inputDD.txt` and ignored by `.gitignore`.
+- **Debugger**: Install ElixirLS to use VSCode's integrated debugging with breakpoints and variable inspection.

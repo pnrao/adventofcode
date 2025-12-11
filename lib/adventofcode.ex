@@ -73,11 +73,24 @@ defmodule AdventOfCode do
   repository, extracts the year from the caller directory and the day from
   the filename (digits in the filename), then downloads and returns the
   input content.
+
+  As a fallback, checks ADVENT_YEAR and ADVENT_DAY environment variables
+  (set by AdventOfCode.Runner).
   """
   def read_input() do
     case caller_script_path() do
       nil ->
-        raise "could not determine caller script path; call read_input(year, day, dir) instead"
+        # Fallback: check environment variables set by Runner
+        year = System.get_env("ADVENT_YEAR")
+        day = System.get_env("ADVENT_DAY")
+
+        if year && day do
+          {y, ""} = Integer.parse(year)
+          {d, ""} = Integer.parse(day)
+          read_input(y, d, to_string(y))
+        else
+          raise "could not determine caller script path; call read_input(year, day, dir) instead"
+        end
 
       script_file ->
         script_dir = Path.dirname(script_file)
@@ -100,68 +113,80 @@ defmodule AdventOfCode do
   # that appears to be inside the current working directory and has an
   # `.ex` or `.exs` extension.
   defp caller_script_path do
-    {:current_stacktrace, stack} = Process.info(self(), :current_stacktrace)
-    cwd = File.cwd!() |> Path.expand()
+    case System.get_env("CALLER_SCRIPT_PATH") do
+      path when is_binary(path) and path != "" ->
+        path
 
-    # Prefer frames where the parent directory looks like a 4-digit year.
-    year_candidate =
-      Enum.find_value(stack, fn
-        {_m, _f, _a, loc} ->
-          file =
-            case loc do
-              [file: f, line: _] when is_binary(f) -> f
-              [file: f, line: _] when is_list(f) -> List.to_string(f)
-              %{file: f} when is_binary(f) -> f
-              {f, _} when is_binary(f) -> f
-              _ -> nil
-            end
+      _ ->
+        {:current_stacktrace, stack} = Process.info(self(), :current_stacktrace)
+        cwd = File.cwd!() |> Path.expand()
 
-          if is_binary(file) do
-            file_exp = Path.expand(file)
-            if String.starts_with?(file_exp, cwd) and Path.extname(file_exp) in [".ex", ".exs"] do
-              parent = Path.basename(Path.dirname(file_exp))
-              if Regex.match?(~r/^\d{4}$/, parent), do: file_exp, else: nil
-            else
-              nil
-            end
-          else
-            nil
-          end
+        # Prefer frames where the parent directory looks like a 4-digit year.
+        year_candidate =
+          Enum.find_value(stack, fn
+            {_m, _f, _a, loc} ->
+              file =
+                case loc do
+                  [file: f, line: _] when is_binary(f) -> f
+                  [file: f, line: _] when is_list(f) -> List.to_string(f)
+                  %{file: f} when is_binary(f) -> f
+                  {f, _} when is_binary(f) -> f
+                  _ -> nil
+                end
 
-        _ ->
-          nil
-      end)
+              if is_binary(file) do
+                file_exp = Path.expand(file)
 
-    case year_candidate do
-      nil ->
-        # Fallback: first .ex/.exs file under cwd
-        Enum.find_value(stack, fn
-          {_m, _f, _a, loc} ->
-            file =
-              case loc do
-                [file: f, line: _] when is_binary(f) -> f
-                [file: f, line: _] when is_list(f) -> List.to_string(f)
-                %{file: f} when is_binary(f) -> f
-                {f, _} when is_binary(f) -> f
-                _ -> nil
-              end
-
-            if is_binary(file) do
-              file_exp = Path.expand(file)
-              if String.starts_with?(file_exp, cwd) and Path.extname(file_exp) in [".ex", ".exs"] do
-                file_exp
+                if String.starts_with?(file_exp, cwd) and Path.extname(file_exp) in [".ex", ".exs"] do
+                  parent = Path.basename(Path.dirname(file_exp))
+                  if Regex.match?(~r/^\d{4}$/, parent), do: file_exp, else: nil
+                else
+                  nil
+                end
               else
                 nil
               end
-            else
+
+            _ ->
               nil
-            end
+          end)
 
-          _ ->
-            nil
-        end)
+        case year_candidate do
+          nil ->
+            # Fallback: first .ex/.exs file under cwd with a 4-digit year parent,
+            # or under a year subdirectory at all
+            Enum.find_value(stack, fn
+              {_m, _f, _a, loc} ->
+                file =
+                  case loc do
+                    [file: f, line: _] when is_binary(f) -> f
+                    [file: f, line: _] when is_list(f) -> List.to_string(f)
+                    %{file: f} when is_binary(f) -> f
+                    {f, _} when is_binary(f) -> f
+                    _ -> nil
+                  end
 
-      file -> file
+                if is_binary(file) do
+                  file_exp = Path.expand(file)
+
+                  if String.starts_with?(file_exp, cwd) and Path.extname(file_exp) in [".ex", ".exs"] do
+                    # Check if the parent directory looks like a year (4 digits)
+                    parent = Path.basename(Path.dirname(file_exp))
+                    if Regex.match?(~r/^\d{4}$/, parent), do: file_exp, else: nil
+                  else
+                    nil
+                  end
+                else
+                  nil
+                end
+
+              _ ->
+                nil
+            end)
+
+          file ->
+            file
+        end
     end
   end
 end
